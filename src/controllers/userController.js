@@ -8,14 +8,8 @@ import {
 } from '../models/userModel.js';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
+import handerResponse from '../utils/handerResponse.js';
 
-const handerResponse = (res,status, message, data = null) => {
-    res.status(status).json({
-        status,
-        message,
-        data
-    });
-}
 
 export const createUser = async (req, res, next) => {
   const { username, password, role, secretKey, name, phone, driverLicense } = req.body;
@@ -23,25 +17,25 @@ export const createUser = async (req, res, next) => {
   try {
     // Basic validation
     if (!username || !password || !role || !name || !phone) {
-      return res.status(400).json({ error: "username, password, role, name and phone are required" });
+      return handerResponse(res, 400, "username, password, role, name and phone are required");
     }
 
     if (!["customer", "staff"].includes(role)) {
-      return res.status(400).json({ error: "Role must be 'customer' or 'staff'" });
+      return handerResponse(res, 400, "Role must be 'customer' or 'staff'");
     }
 
     if (role === "staff" && secretKey !== process.env.STAFF_SECRET_KEY) {
-      return res.status(403).json({ error: "Invalid staff secret key" });
+      return handerResponse(res, 403, "Invalid staff secret key");
     }
 
     // Validate phone shape (11 digits)
     if (!/^[0-9]{11}$/.test(phone)) {
-      return res.status(400).json({ error: "phone must be exactly 11 digits" });
+      return handerResponse(res, 400, "phone must be exactly 11 digits");
     }
 
     // driverLicense required for customer
     if (role === "customer" && (!driverLicense || driverLicense.length > 20)) {
-      return res.status(400).json({ error: "driverLicense is required for customers and max 20 chars" });
+      return handerResponse(res, 400, "driverLicense is required for customers and max 20 chars");
     }
 
     const result = await createUserAndProfileService({
@@ -55,7 +49,7 @@ export const createUser = async (req, res, next) => {
     return handerResponse(res, 201, "User and profile created successfully", result);
   } catch (err) {
     if (err.code === "23505") {
-      return res.status(409).json({ error: "Duplicate value. Possibly username, phone or driver license already exists." });
+      return handerResponse(res, 409, "Duplicate value. Possibly username, phone or driver license already exists.");
     }
     // Unexpected
     next(err);

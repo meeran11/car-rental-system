@@ -3,7 +3,7 @@ import pool from "../config/db.js";
 const createUserTable = async () => {
     const queryText = `
    CREATE TABLE IF NOT EXISTS users (
-    userid SERIAL PRIMARY KEY,
+    userId SERIAL PRIMARY KEY,
     username VARCHAR(50) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
     role VARCHAR(20) NOT NULL CHECK (role IN ('customer', 'staff')),

@@ -7,35 +7,40 @@ export const createUserAndProfileService = async ({ username, password, role, na
   try {
     await client.query("BEGIN");
 
+    // Hash password
     const saltRounds = 10;
     const hashed = await bcrypt.hash(password, saltRounds);
 
+    // 1) Insert into users table
     const insertUserText = `
       INSERT INTO users (username, password, role)
       VALUES ($1, $2, $3)
-      RETURNING userid, username, role, created_at
+      RETURNING *
     `;
     const userRes = await client.query(insertUserText, [username, hashed, role]);
     const user = userRes.rows[0];
 
     let profile = null;
+
+    // 2) Insert into customer or staff profile
     if (role === "customer") {
       const insertCustomerText = `
-        INSERT INTO customers (customername, customerphone, driverlicense, created_at)
-        VALUES ($1, $2, $3, NOW())
-        RETURNING customerid, customername, customerphone, driverlicense, created_at
+        INSERT INTO customers (userId, customerName, customerPhone, driverLicense, created_at)
+        VALUES ($1, $2, $3, $4, NOW())
+        RETURNING customerId, userId, customerName, customerPhone, driverLicense, created_at
       `;
-      const custRes = await client.query(insertCustomerText, [name, phone, driverLicense]);
+      const custRes = await client.query(insertCustomerText, [user.userid, name, phone, driverLicense]);
       profile = custRes.rows[0];
     } else if (role === "staff") {
       const insertStaffText = `
-        INSERT INTO staff (staffname, staffphone, created_at)
-        VALUES ($1, $2, NOW())
-        RETURNING staffid, staffname, staffphone, created_at
+        INSERT INTO staff (userId, staffName, staffPhone, created_at)
+        VALUES ($1, $2, $3, NOW())
+        RETURNING staffId, userId, staffName, staffPhone, created_at
       `;
-      const staffRes = await client.query(insertStaffText, [name, phone]);
+      const staffRes = await client.query(insertStaffText, [user.userId, name, phone]);
       profile = staffRes.rows[0];
     }
+
     await client.query("COMMIT");
     return { user, profile };
   } catch (err) {
@@ -71,7 +76,7 @@ export const updateUserService = async (id, fields) => {
 
     if (inputKeys.length === 0) {
         const res = await pool.query(
-            'SELECT userid, username, created_at FROM users WHERE userid = $1',
+            'SELECT userId, username, created_at FROM users WHERE userId = $1',
             [id]
         );
         if (res.rows.length === 0) throw new Error('User not found');
@@ -90,7 +95,7 @@ export const updateUserService = async (id, fields) => {
         UPDATE users
         SET ${setString}
         WHERE userid = $${values.length}
-        RETURNING userid, username, role, created_at
+        RETURNING userId, username, role, created_at
     `;
 
     const result = await pool.query(query, values);
@@ -100,6 +105,6 @@ export const updateUserService = async (id, fields) => {
 };
 
 export const deleteUserService = async (id) => {
-    const result = await pool.query('DELETE FROM users WHERE userid = $1 RETURNING userid', [id]);
+    const result = await pool.query('DELETE FROM users WHERE userId = $1 RETURNING userId', [id]);
     return result.rows[0];
 }

@@ -6,10 +6,10 @@ import { uploadCar,
         deleteCarByID,
  } from '../controllers/carController.js';
 import { auth } from '../middlewares/auth.js';
-import { updateCarByIDService } from '../models/carModel.js';
+import { authorizeRoles } from '../middlewares/authorizeRoles.js';
 const router = express.Router();
 
-router.post('/uploadCar', auth, uploadCar);
+router.post('/uploadCar', auth,authorizeRoles('staff'),uploadCar);
 router.get('/cars', getAllCars);
 router.get('/cars/:id', auth, getCarById);
 router.put('/cars/:id',auth,updateCarByID);

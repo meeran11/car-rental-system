@@ -1,18 +1,12 @@
 import { uploadCarService,getAllCarsService,getCarByIdService ,updateCarByIDService,deleteCarByIDService} from "../models/carModel.js";
-const handerResponse = (res,status, message, data = null) => {
-    res.status(status).json({
-        status,
-        message,
-        data
-    });
-}
+import handerResponse from '../utils/handerResponse.js';
 export const uploadCar = async (req, res, next) => {
-    const { carmodel, caryear, carstatus, maintenanceid, carimageurl } = req.body; 
-    if (!carmodel || !caryear || !carstatus || !carimageurl) {
+    const { carModel, carYear, carStatus, maintenanceId, carImageUrl } = req.body; 
+    if (!carModel || !carYear || !carStatus || !carImageUrl) {
         return handerResponse(res, 400, 'fields are missing in car info');
     } 
     try {
-        const newCar = await uploadCarService({ carmodel, caryear, carstatus, maintenanceid, carimageurl });
+        const newCar = await uploadCarService({ carModel, carYear, carStatus, maintenanceId, carImageUrl });
         handerResponse(res, 201, 'Car uploaded successfully', newCar);
     } catch (error) {
         next(error);
@@ -67,10 +61,10 @@ export const deleteCarByID = async (req, res, next) => {
         const deletedCar = await deleteCarByIDService(id);
 
         if (!deletedCar) {
-            return handlerResponse(res, 404, 'Car not found');
+            return handerResponse(res, 404, 'Car not found');
         }
 
-        handlerResponse(res, 200, 'Car deleted successfully', deletedCar);
+        handerResponse(res, 200, 'Car deleted successfully', deletedCar);
     } catch (error) {
         next(error);
     }
