@@ -10,14 +10,14 @@ export default function Bookings(){
 
   useEffect(() => {
     loadBookings();
-  }, [user?.id]);
+  }, [user?.userid]);
 
   async function loadBookings(){
-    if (!user?.id) return;
+    if (!user?.userid) return;
     setLoading(true);
     setError(null);
     try {
-      const data = await fetchJson(`/rental/pendingRequests/${user.id}`);
+      const data = await fetchJson(`/rental/pendingRequests/${user.userid}`);
       setBookings(data.data || []);
     } catch (err) {
       setError(err);
@@ -34,12 +34,12 @@ export default function Bookings(){
       <h2 className="text-xl font-semibold mb-4" style={{ color: '#0F172A' }}>My Bookings</h2>
       <ul>
         {bookings && bookings.length ? bookings.map(b => (
-          <li key={b.bookingId} className="card-modern p-3 mb-2">
-            <div style={{ color: '#0F172A' }} className="font-medium">Car: {b.carId}</div>
-            <div style={{ color: '#64748B' }} className="text-sm mt-1">From: {b.startDate} To: {b.endDate}</div>
+          <li key={b.bookingid} className="card-modern p-3 mb-2">
+            <div style={{ color: '#0F172A' }} className="font-medium">Car: {b.carid}</div>
+            <div style={{ color: '#64748B' }} className="text-sm mt-1">From: {b.startdate} To: {b.enddate}</div>
             <div className="flex justify-between items-center mt-2">
-              <div style={{ color: '#10B981' }} className="font-medium">${b.totalAmount}</div>
-              <span className="badge-primary">{b.rentalStatus}</span>
+              <div style={{ color: '#10B981' }} className="font-medium">${b.totalamount}</div>
+              <span className="badge-primary">{b.rentalstatus}</span>
             </div>
           </li>
         )) : <div style={{ color: '#64748B' }}>No bookings yet.</div>}

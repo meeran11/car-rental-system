@@ -19,16 +19,16 @@ export default function PendingRequests(){
 
   useEffect(()=>{ load(); }, []);
 
-  async function approve(bookingId){
+  async function approve(bookingid){
     try {
-      await fetchJson('/rental/approveRental', { method: 'POST', body: { bookingId, staffId: user?.id } });
+      await fetchJson('/rental/approveRental', { method: 'POST', body: { bookingId: bookingid, staffId: user?.userid } });
       load();
     } catch (e) { alert(e.message || 'Failed'); }
   }
 
-  async function decline(bookingId){
+  async function decline(bookingid){
     try {
-      await fetchJson('/rental/declineRental', { method: 'POST', body: { bookingId } });
+      await fetchJson('/rental/declineRental', { method: 'POST', body: { bookingId: bookingid } });
       load();
     } catch (e) { alert(e.message || 'Failed'); }
   }
@@ -40,20 +40,20 @@ export default function PendingRequests(){
         <div style={{ color: '#64748B' }}>Loading...</div>
       ) : requests.length ? (
         requests.map(r => (
-          <div key={r.bookingId} className="card-modern p-3 mb-2">
-            <div style={{ color: '#0F172A' }}>Customer: {r.customerId} — Car: {r.carId}</div>
+          <div key={r.bookingid} className="card-modern p-3 mb-2">
+            <div style={{ color: '#0F172A' }}>Customer: {r.customerid} — Car: {r.carid}</div>
             <div style={{ color: '#64748B' }} className="text-sm mt-1">
-              {r.startDate} to {r.endDate} • ${r.totalAmount}
+              {r.startdate} to {r.enddate} • ${r.totalamount}
             </div>
             <div className="mt-2 flex gap-2">
               <button 
-                onClick={()=>approve(r.bookingId)} 
+                onClick={()=>approve(r.bookingid)} 
                 className="btn-success text-sm px-3 py-1"
               >
                 Approve
               </button>
               <button 
-                onClick={()=>decline(r.bookingId)} 
+                onClick={()=>decline(r.bookingid)} 
                 className="btn-danger text-sm px-3 py-1"
               >
                 Decline

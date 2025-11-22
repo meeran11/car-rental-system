@@ -19,10 +19,10 @@ export default function Maintenance(){
     }
   }
 
-  async function deleteMaintenance(maintenanceId){
+  async function deleteMaintenance(maintenanceid){
     if (!window.confirm('Are you sure you want to delete this maintenance record?')) return;
     try {
-      await fetchJson(`/api/maintenance/${maintenanceId}`, { method: 'DELETE' });
+      await fetchJson(`/api/maintenance/${maintenanceid}`, { method: 'DELETE' });
       load();
     } catch(e) {
       alert(e.message || 'Failed to delete');
@@ -37,19 +37,19 @@ export default function Maintenance(){
       ) : items.length ? (
         <ul>
           {items.map(it => (
-            <li key={it.maintenanceId} className="card-modern p-3 mb-2">
+            <li key={it.maintenanceid} className="card-modern p-3 mb-2">
               <div className="flex justify-between items-start">
                 <div>
-                  <div style={{ color: '#0F172A' }} className="font-medium">{it.maintenanceType}</div>
+                  <div style={{ color: '#0F172A' }} className="font-medium">{it.maintenancetype}</div>
                   <div style={{ color: '#64748B' }} className="text-sm">
-                    Car: {it.carId} • Date: {it.maintenanceDate}
+                    Car: {it.carid} • Date: {it.maintenancedate}
                   </div>
                   <div style={{ color: '#10B981' }} className="text-sm font-medium">
-                    Cost: ${it.maintenanceCost}
+                    Cost: ${it.maintenancecost}
                   </div>
                 </div>
                 <button 
-                  onClick={() => deleteMaintenance(it.maintenanceId)}
+                  onClick={() => deleteMaintenance(it.maintenanceid)}
                   className="text-sm px-3 py-1 rounded transition-colors"
                   style={{ color: '#EF4444' }}
                   onMouseEnter={(e) => e.target.style.backgroundColor = '#FEE2E2'}

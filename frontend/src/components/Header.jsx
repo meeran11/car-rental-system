@@ -34,6 +34,15 @@ export default function Header(){
           ))}
           {user ? (
             <>
+              <Link 
+                to="/account" 
+                className="ml-2 px-4 py-2 text-sm font-medium rounded-lg transition-colors duration-200"
+                style={{ color: '#64748B' }}
+                onMouseEnter={(e) => e.target.style.color = '#3B82F6'}
+                onMouseLeave={(e) => e.target.style.color = '#64748B'}
+              >
+                Account
+              </Link>
               {user.role === 'staff' ? (
                 <Link 
                   to="/staff" 

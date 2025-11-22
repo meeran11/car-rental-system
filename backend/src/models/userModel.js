@@ -37,7 +37,7 @@ export const createUserAndProfileService = async ({ username, password, role, na
         VALUES ($1, $2, $3, NOW())
         RETURNING staffId, userId, staffName, staffPhone, created_at
       `;
-      const staffRes = await client.query(insertStaffText, [user.userId, name, phone]);
+      const staffRes = await client.query(insertStaffText, [user.userid, name, phone]);
       profile = staffRes.rows[0];
     }
 

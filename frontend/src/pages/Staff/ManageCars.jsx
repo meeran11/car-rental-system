@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { fetchJson } from '../../api';
 import Modal from '../../components/Modal';
+import ImageUploader from '../../components/ImageUploader';
 
 export default function ManageCars(){
   const [cars, setCars] = useState([]);
@@ -8,9 +9,8 @@ export default function ManageCars(){
   const [showModal, setShowModal] = useState(false);
   const [editingCar, setEditingCar] = useState(null);
   const [formData, setFormData] = useState({
-    carBrand: '', carModel: '', carYear: '', carType: '', carPrice: '', 
-    carStatus: 'available', carImage: '', description: '', seats: '', 
-    transmission: '', fuelType: ''
+    carModel: '', carYear: '', carPrice: '', 
+    carStatus: 'available', carImageUrl: ''
   });
 
   async function loadCars(){
@@ -28,10 +28,9 @@ export default function ManageCars(){
   function openEditModal(car){
     setEditingCar(car);
     setFormData({
-      carBrand: car.carBrand || '', carModel: car.carModel || '', carYear: car.carYear || '', 
-      carType: car.carType || '', carPrice: car.carPrice || '', carStatus: car.carStatus || 'available', 
-      carImage: car.carImage || '', description: car.description || '', seats: car.seats || '', 
-      transmission: car.transmission || '', fuelType: car.fuelType || ''
+      carModel: car.carmodel || '', carYear: car.caryear || '', 
+      carPrice: car.carprice || '', carStatus: car.carstatus || 'available', 
+      carImageUrl: car.carimageurl || ''
     });
     setShowModal(true);
   }
@@ -39,23 +38,28 @@ export default function ManageCars(){
   function openNewCarModal(){
     setEditingCar(null);
     setFormData({
-      carBrand: '', carModel: '', carYear: '', carType: '', carPrice: '', 
-      carStatus: 'available', carImage: '', description: '', seats: '', 
-      transmission: '', fuelType: ''
+      carModel: '', carYear: '', carPrice: '', 
+      carStatus: 'available', carImageUrl: ''
     });
     setShowModal(true);
   }
 
   async function saveCar(){
     try {
+      // Validate required fields
+      if (!formData.carModel || !formData.carYear || !formData.carPrice || !formData.carImageUrl) {
+        alert('Please fill in all required fields: Name, Year, Price, and Image');
+        return;
+      }
+
       if (editingCar) {
-        await fetchJson(`/car/cars/${editingCar.carId}`, {
+        await fetchJson(`/car/cars/${editingCar.carid}`, {
           method: 'PUT',
           body: formData
         });
         alert('Car updated successfully');
       } else {
-        await fetchJson('/car/cars', {
+        await fetchJson('/car/uploadCar', {
           method: 'POST',
           body: formData
         });
@@ -103,24 +107,24 @@ export default function ManageCars(){
       ) : (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
           {cars.map(c => (
-            <div key={c.carId} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-              <div className="h-40 bg-gray-200 overflow-hidden">
-                <img src={c.carImage || 'https://via.placeholder.com/400x200?text=Car'} alt={c.carModel} className="w-full h-full object-cover" />
+            <div key={c.carid} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+            <div className="h-40 bg-gray-200 overflow-hidden">
+                <img src={c.carimageurl || 'https://via.placeholder.com/400x200?text=Car'} alt={c.carmodel} className="w-full h-full object-cover" />
               </div>
               <div className="p-4">
                 <h3 className="text-lg font-bold" style={{ color: '#0F172A' }}>
-                  {c.carBrand} {c.carModel}
+                  {c.carbrand} {c.carmodel}
                 </h3>
                 <p style={{ color: '#64748B' }} className="text-sm mb-3">
-                  {c.carYear} | {c.carType}
+                  {c.caryear} | {c.cartype}
                 </p>
                 <div className="mb-3 space-y-1">
                   <p style={{ color: '#64748B' }} className="text-sm">
-                    <span className="font-semibold" style={{ color: '#3B82F6' }}>${c.carPrice}</span>/day
+                    <span className="font-semibold" style={{ color: '#3B82F6' }}>${c.carprice}</span>/day
                   </p>
                   <p style={{ color: '#64748B' }} className="text-sm">
-                    Status: <span className={`font-semibold ${c.carStatus === 'available' ? 'text-green-600' : 'text-red-600'}`}>
-                      {c.carStatus}
+                    Status: <span className={`font-semibold ${c.carstatus === 'available' ? 'text-green-600' : 'text-red-600'}`}>
+                      {c.carstatus}
                     </span>
                   </p>
                 </div>
@@ -133,7 +137,7 @@ export default function ManageCars(){
                     Edit
                   </button>
                   <button 
-                    onClick={() => deleteCar(c.carId)}
+                    onClick={() => deleteCar(c.carid)}
                     className="flex-1 px-3 py-2 rounded font-medium text-sm transition-colors"
                     style={{ backgroundColor: '#FEE2E2', color: '#EF4444' }}
                   >
@@ -149,27 +153,16 @@ export default function ManageCars(){
       {showModal && (
         <Modal open={showModal} title={editingCar ? 'Edit Car' : 'Add New Car'} onClose={() => setShowModal(false)}>
           <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium mb-1" style={{ color: '#0F172A' }}>Brand</label>
-                <input 
-                  type="text" 
-                  value={formData.carBrand}
-                  onChange={(e) => setFormData({...formData, carBrand: e.target.value})}
-                  className="w-full px-3 py-2 border rounded-lg"
-                  style={{ borderColor: '#E2E8F0' }}
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1" style={{ color: '#0F172A' }}>Model</label>
-                <input 
-                  type="text" 
-                  value={formData.carModel}
-                  onChange={(e) => setFormData({...formData, carModel: e.target.value})}
-                  className="w-full px-3 py-2 border rounded-lg"
-                  style={{ borderColor: '#E2E8F0' }}
-                />
-              </div>
+            <div>
+              <label className="block text-sm font-medium mb-1" style={{ color: '#0F172A' }}>Car Name</label>
+              <input 
+                type="text" 
+                value={formData.carModel}
+                onChange={(e) => setFormData({...formData, carModel: e.target.value})}
+                className="w-full px-3 py-2 border rounded-lg"
+                style={{ borderColor: '#E2E8F0' }}
+                placeholder="e.g., Toyota Corolla"
+              />
             </div>
 
             <div className="grid grid-cols-2 gap-4">
@@ -181,21 +174,9 @@ export default function ManageCars(){
                   onChange={(e) => setFormData({...formData, carYear: e.target.value})}
                   className="w-full px-3 py-2 border rounded-lg"
                   style={{ borderColor: '#E2E8F0' }}
+                  placeholder="2024"
                 />
               </div>
-              <div>
-                <label className="block text-sm font-medium mb-1" style={{ color: '#0F172A' }}>Type</label>
-                <input 
-                  type="text" 
-                  value={formData.carType}
-                  onChange={(e) => setFormData({...formData, carType: e.target.value})}
-                  className="w-full px-3 py-2 border rounded-lg"
-                  style={{ borderColor: '#E2E8F0' }}
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium mb-1" style={{ color: '#0F172A' }}>Price/Day</label>
                 <input 
@@ -204,76 +185,31 @@ export default function ManageCars(){
                   onChange={(e) => setFormData({...formData, carPrice: e.target.value})}
                   className="w-full px-3 py-2 border rounded-lg"
                   style={{ borderColor: '#E2E8F0' }}
+                  placeholder="5000"
                 />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1" style={{ color: '#0F172A' }}>Status</label>
-                <select 
-                  value={formData.carStatus}
-                  onChange={(e) => setFormData({...formData, carStatus: e.target.value})}
-                  className="w-full px-3 py-2 border rounded-lg"
-                  style={{ borderColor: '#E2E8F0' }}
-                >
-                  <option value="available">Available</option>
-                  <option value="rented">Rented</option>
-                  <option value="maintenance">Maintenance</option>
-                </select>
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1" style={{ color: '#0F172A' }}>Image URL</label>
-              <input 
-                type="text" 
-                value={formData.carImage}
-                onChange={(e) => setFormData({...formData, carImage: e.target.value})}
+              <label className="block text-sm font-medium mb-1" style={{ color: '#0F172A' }}>Status</label>
+              <select 
+                value={formData.carStatus}
+                onChange={(e) => setFormData({...formData, carStatus: e.target.value})}
                 className="w-full px-3 py-2 border rounded-lg"
                 style={{ borderColor: '#E2E8F0' }}
-              />
+              >
+                <option value="available">Available</option>
+                <option value="rented">Rented</option>
+                <option value="maintenance">Maintenance</option>
+              </select>
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1" style={{ color: '#0F172A' }}>Description</label>
-              <textarea 
-                value={formData.description}
-                onChange={(e) => setFormData({...formData, description: e.target.value})}
-                className="w-full px-3 py-2 border rounded-lg"
-                style={{ borderColor: '#E2E8F0' }}
-                rows="3"
+              <label className="block text-sm font-medium mb-1" style={{ color: '#0F172A' }}>Car Image</label>
+              <ImageUploader 
+                onImageUrlChange={(url) => setFormData({...formData, carImageUrl: url})}
+                imagePreview={formData.carImageUrl}
               />
-            </div>
-
-            <div className="grid grid-cols-3 gap-4">
-              <div>
-                <label className="block text-sm font-medium mb-1" style={{ color: '#0F172A' }}>Seats</label>
-                <input 
-                  type="number" 
-                  value={formData.seats}
-                  onChange={(e) => setFormData({...formData, seats: e.target.value})}
-                  className="w-full px-3 py-2 border rounded-lg"
-                  style={{ borderColor: '#E2E8F0' }}
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1" style={{ color: '#0F172A' }}>Transmission</label>
-                <input 
-                  type="text" 
-                  value={formData.transmission}
-                  onChange={(e) => setFormData({...formData, transmission: e.target.value})}
-                  className="w-full px-3 py-2 border rounded-lg"
-                  style={{ borderColor: '#E2E8F0' }}
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1" style={{ color: '#0F172A' }}>Fuel Type</label>
-                <input 
-                  type="text" 
-                  value={formData.fuelType}
-                  onChange={(e) => setFormData({...formData, fuelType: e.target.value})}
-                  className="w-full px-3 py-2 border rounded-lg"
-                  style={{ borderColor: '#E2E8F0' }}
-                />
-              </div>
             </div>
 
             <div className="flex gap-3 pt-4">

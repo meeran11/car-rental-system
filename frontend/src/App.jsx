@@ -7,6 +7,7 @@ import Cars from './pages/Cars';
 import CarDetail from './pages/CarDetail';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import Account from './pages/Account';
 import Bookings from './pages/Customer/Bookings';
 import BookingFlow from './pages/Customer/BookingFlow';
 import BookingConfirm from './pages/Customer/BookingConfirm';
@@ -27,6 +28,7 @@ export default function App(){
           <Route path="/cars/:id" element={<CarDetail />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/account" element={<ProtectedRoute><Account /></ProtectedRoute>} />
 
           <Route path="/customer/bookings" element={<ProtectedRoute role="customer"><Bookings /></ProtectedRoute>} />
           <Route path="/customer/book/:id" element={<ProtectedRoute role="customer"><BookingFlow /></ProtectedRoute>} />

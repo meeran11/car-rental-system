@@ -7,7 +7,11 @@ import {
     getAllUsers,
     getUserById,
     updateUser,
-    deleteUser
+    deleteUser,
+    updateCustomerInfo,
+    getCustomerInfo,
+    updateStaffInfo,
+    getStaffInfo
 } from '../controllers/userController.js';
 const router = express.Router();
 
@@ -17,8 +21,13 @@ router.get('/users',auth,authorizeRoles('staff'), getAllUsers);
 router.get('/users/:id',auth,getUserById); 
 router.put('/users/:id',auth,updateUser);
 router.delete('/users/:id',auth,deleteUser);
+
+// Customer profile routes
+router.get('/customer/:id', auth, getCustomerInfo);
+router.put('/customer/:id', auth, updateCustomerInfo);
+
+// Staff profile routes
+router.get('/staff/:id', auth, authorizeRoles('staff'), getStaffInfo);
+router.put('/staff/:id', auth, authorizeRoles('staff'), updateStaffInfo);
     
-
-
-
 export default router;

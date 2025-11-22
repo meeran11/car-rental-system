@@ -15,6 +15,17 @@ export default function BookingFlow(){
   const [loading, setLoading] = useState(false);
   const nav = useNavigate();
 
+  if (user?.role === 'staff') {
+    return (
+      <div className="min-h-[calc(100vh-200px)] flex items-center justify-center py-12 px-4">
+        <div className="w-full max-w-md card-modern p-8 text-center">
+          <h2 className="text-xl font-semibold mb-4" style={{ color: '#0F172A' }}>Booking Unavailable</h2>
+          <p style={{ color: '#64748B' }}>Staff members are not permitted to book cars.</p>
+        </div>
+      </div>
+    );
+  }
+
   async function submit(e){
     e.preventDefault();
     setLoading(true);
@@ -39,12 +50,12 @@ export default function BookingFlow(){
       await fetchJson('/rental/create', { 
         method: 'POST', 
         body: { 
-          userId: user?.id,
+          userId: user?.userid,
           carId: parseInt(id),
           startDate,
           endDate,
           totalAmount,
-          paymentId: paymentData.data?.paymentId
+          paymentId: paymentData.data?.paymentid
         } 
       });
       

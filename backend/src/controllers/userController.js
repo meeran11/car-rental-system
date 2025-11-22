@@ -6,6 +6,8 @@ import {
     updateUserService,    
     deleteUserService
 } from '../models/userModel.js';
+import { updateCustomerInfoService, getCustomerByUserIdService } from '../models/customerModel.js';
+import { updateStaffInfoService, getStaffByUserIdService } from '../models/staffModel.js';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import handerResponse from '../utils/handerResponse.js';
@@ -84,6 +86,7 @@ export const loginUser = async (req,res,next) => {
     res.status(200).json({
       message: "Login successful",
       token,
+      userid: user.userid,
       role: user.role
     });
   } catch (err) {
@@ -153,3 +156,108 @@ export const deleteUser = async(req, res, next) => {
         next(error);
     }
 }
+
+export const updateCustomerInfo = async (req, res, next) => {
+    const { id } = req.params;
+    const { customerName, customerPhone, driverLicense } = req.body;
+
+    try {
+        // Validate phone if provided
+        if (customerPhone && !/^[0-9]{11}$/.test(customerPhone)) {
+            return handerResponse(res, 400, "Phone must be exactly 11 digits");
+        }
+
+        // Validate driverLicense if provided
+        if (driverLicense && driverLicense.length > 20) {
+            return handerResponse(res, 400, "Driver license must be max 20 characters");
+        }
+
+        // Build fields object with only provided values
+        const fields = { customerName, customerPhone, driverLicense };
+        Object.keys(fields).forEach(key => {
+            if (fields[key] === undefined || fields[key] === "") {
+                delete fields[key];
+            }
+        });
+
+        const updatedCustomer = await updateCustomerInfoService(id, fields);
+
+        if (!updatedCustomer) {
+            return handerResponse(res, 404, "Customer not found");
+        }
+
+        return handerResponse(res, 200, "Customer information updated successfully", updatedCustomer);
+
+    } catch (error) {
+        if (error.code === "23505") {
+            return handerResponse(res, 409, "Phone or driver license already exists");
+        }
+        next(error);
+    }
+};
+
+export const getCustomerInfo = async (req, res, next) => {
+    const { id } = req.params;
+    try {
+        if (!id || isNaN(id)) {
+            return handerResponse(res, 400, "Invalid user ID");
+        }
+        const customer = await getCustomerByUserIdService(id);
+        if (!customer) {
+            return handerResponse(res, 404, "Customer not found");
+        }
+        handerResponse(res, 200, "Customer information retrieved successfully", customer);
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const updateStaffInfo = async (req, res, next) => {
+    const { id } = req.params;
+    const { staffName, staffPhone } = req.body;
+
+    try {
+        // Validate phone if provided
+        if (staffPhone && !/^[0-9]{11}$/.test(staffPhone)) {
+            return handerResponse(res, 400, "Phone must be exactly 11 digits");
+        }
+
+        // Build fields object with only provided values
+        const fields = { staffName, staffPhone };
+        Object.keys(fields).forEach(key => {
+            if (fields[key] === undefined || fields[key] === "") {
+                delete fields[key];
+            }
+        });
+
+        const updatedStaff = await updateStaffInfoService(id, fields);
+
+        if (!updatedStaff) {
+            return handerResponse(res, 404, "Staff not found");
+        }
+
+        return handerResponse(res, 200, "Staff information updated successfully", updatedStaff);
+
+    } catch (error) {
+        if (error.code === "23505") {
+            return handerResponse(res, 409, "Phone already exists");
+        }
+        next(error);
+    }
+};
+
+export const getStaffInfo = async (req, res, next) => {
+    const { id } = req.params;
+    try {
+        if (!id || isNaN(id)) {
+            return handerResponse(res, 400, "Invalid user ID");
+        }
+        const staff = await getStaffByUserIdService(id);
+        if (!staff) {
+            return handerResponse(res, 404, "Staff not found");
+        }
+        handerResponse(res, 200, "Staff information retrieved successfully", staff);
+    } catch (error) {
+        next(error);
+    }
+};

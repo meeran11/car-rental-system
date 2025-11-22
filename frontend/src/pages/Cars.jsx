@@ -47,7 +47,7 @@ export default function Cars(){
           <>
             <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-6">
               {cars && cars.length ? (
-                cars.map(c => <CarCard key={c.carId} car={c} />)
+                cars.map(c => <CarCard key={c.carid} car={c} />)
               ) : (
                 <div className="col-span-full text-center py-12">
                   <p className="text-lg" style={{ color: '#94A3B8' }}>No cars found. Try adjusting your filters.</p>
