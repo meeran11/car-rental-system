@@ -8,6 +8,7 @@ const createCarsTable = async () => {
     carModel VARCHAR(100) NOT NULL,
     carYear INT NOT NULL CHECK (carYear >= 1980 AND carYear <= EXTRACT(YEAR FROM CURRENT_DATE)),
     carStatus VARCHAR(20) NOT NULL CHECK (carStatus IN ('available', 'requested', 'rented', 'maintenance')),
+    carPrice NUMERIC(10,2) NOT NULL CHECK (carPrice >= 0),
     maintenanceId INT,
     carImageUrl VARCHAR(255),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

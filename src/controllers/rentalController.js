@@ -7,7 +7,8 @@ import {
   approveRentalService,
   getRentedCarsByUserService,
   getRequestedRentalsByUserService,
-  endRentalService
+  endRentalService,
+  declineRentalService
  } from '../models/rentalModel.js';
 export const createRental = async (req, res, next) => {
   try {
@@ -193,6 +194,27 @@ export const endRental = async (req, res, next) => {
     const result = await endRentalService(bookingIdNum);
 
     return handerResponse(res, 200, "Rental ended successfully", result);
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const declineRental = async (req, res, next) => {
+  try {
+    const { bookingId } = req.body;
+
+    if (!bookingId) {
+      return handerResponse(res, 400, "bookingId is required");
+    }
+
+    const bookingIdNum = Number(bookingId);
+    if (!Number.isInteger(bookingIdNum) || bookingIdNum <= 0) {
+      return handerResponse(res, 400, "bookingId must be a positive integer");
+    }
+
+    const result = await declineRentalService(bookingIdNum);
+
+    return handerResponse(res, 201, "Rental declined successfully", result);
   } catch (err) {
     next(err);
   }

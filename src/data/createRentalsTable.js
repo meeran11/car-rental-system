@@ -12,6 +12,7 @@ export const createRentalsTable = async () => {
     startDate DATE NOT NULL,
     endDate DATE NOT NULL,
     totalAmount NUMERIC(12,2) NOT NULL CHECK (totalAmount >= 0),
+    status VARCHAR(20) NOT NULL DEFAULT 'requested' CHECK (status IN ('completed', 'declined', 'requested', 'active')),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT chk_rental_dates CHECK (startDate < endDate),
