@@ -117,12 +117,20 @@ export const getRequestedRentalsService = async () => {
   return rows;
 };
 
-export const approveRentalService = async ({ bookingId, staffId }) => {
+export const approveRentalService = async ({ bookingId, userId }) => {
   const client = await pool.connect();
 
   try {
     await client.query("BEGIN");
-
+    //get staffId from userId
+    const { rows: staffRows } = await client.query(
+      `SELECT staffId FROM staff WHERE userId = $1`,
+      [userId]
+    );
+    if(staffRows.length === 0) {
+      throw new Error("Staff not found");
+    }
+    const staffId = staffRows[0].staffid;
     // 1) Check rental status
     const { rows } = await client.query(
       `

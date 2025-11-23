@@ -4,7 +4,7 @@ const createMaintenanceTable = async () => {
     const queryText = `
    CREATE TABLE IF NOT EXISTS maintenance (
     maintenanceId SERIAL PRIMARY KEY,
-    maintenanceDate DATE NOT NULL,
+    maintenanceDate DATE NOT NULL DEFAULT CURRENT_DATE,
     maintenanceType VARCHAR(100) NOT NULL,
     maintenanceCost DECIMAL(10,2) NOT NULL
 );

@@ -39,7 +39,8 @@ export default function ManageCars(){
     setEditingCar(null);
     setFormData({
       carModel: '', carYear: '', carPrice: '', 
-      carStatus: 'available', carImageUrl: ''
+      carStatus: 'available', carImageUrl: '',
+      
     });
     setShowModal(true);
   }
@@ -53,10 +54,18 @@ export default function ManageCars(){
       }
 
       if (editingCar) {
-        await fetchJson(`/car/cars/${editingCar.carid}`, {
+        if(formData.carStatus === 'maintenance'){
+          await fetchJson(`/api/maintenance`, {
+          method: 'POST',
+          body: formData
+        });
+        }
+        else{
+          await fetchJson(`/car/cars/${editingCar.carid}`, {
           method: 'PUT',
           body: formData
         });
+      }
         alert('Car updated successfully');
       } else {
         await fetchJson('/car/uploadCar', {

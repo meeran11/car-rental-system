@@ -21,7 +21,7 @@ export default function PendingRequests(){
 
   async function approve(bookingid){
     try {
-      await fetchJson('/rental/approveRental', { method: 'POST', body: { bookingId: bookingid, staffId: user?.userid } });
+      await fetchJson('/rental/approveRental', { method: 'POST', body: { bookingId: bookingid, userId: user?.userid } });
       load();
     } catch (e) { alert(e.message || 'Failed'); }
   }

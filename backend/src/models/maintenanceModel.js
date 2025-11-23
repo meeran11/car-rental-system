@@ -25,7 +25,7 @@ export const createMaintenanceWithCarLink = async (carId, { maintenanceDate, mai
     const maintenanceid = insertResult.rows[0].maintenanceid;
 
     await client.query(
-      `UPDATE cars SET maintenanceid = $1 WHERE carid = $2`,
+      `UPDATE cars SET maintenanceid = $1,carstatus = 'maintenance' WHERE carid = $2`,
       [maintenanceid, carId]
     );
 

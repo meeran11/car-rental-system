@@ -117,20 +117,19 @@ export const getRequestedRentals = async (req, res, next) => {
 
 export const approveRentals = async (req, res, next) => {
   try {
-    const { bookingId, staffId } = req.body;
+    const { bookingId, userId } = req.body;
 
-    if (!bookingId || !staffId) {
-      return handerResponse(res, 400, "bookingId and staffId are required");
+    if (!bookingId || !userId) {
+      return handerResponse(res, 400, "bookingId and userId are required");
     }
 
     const bookingIdNum = Number(bookingId);
-    const staffIdNum = Number(staffId);
-
-    if ([bookingIdNum, staffIdNum].some(n => !Number.isInteger(n) || n <= 0)) {
-      return handerResponse(res, 400, "bookingId and staffId must be positive integers");
+    const userIdNum = Number(userId);
+    if ([bookingIdNum, userIdNum].some(n => !Number.isInteger(n) || n <= 0)) {
+      return handerResponse(res, 400, "bookingId and userId must be positive integers");
     }
 
-    const result = await approveRentalService({ bookingId: bookingIdNum, staffId: staffIdNum });
+    const result = await approveRentalService({ bookingId: bookingIdNum, userId: userIdNum });
 
     return handerResponse(res, 201, "Rental approved successfully", result);
   } catch (err) {

@@ -30,7 +30,8 @@ export const createRentalsTable = async () => {
     CONSTRAINT fk_rental_staff
         FOREIGN KEY (staffId)
         REFERENCES staff(staffId)
-        ON DELETE SET NULL,
+        ON DELETE SET NULL
+        ON UPDATE CASCADE,
 
     CONSTRAINT fk_rental_car
         FOREIGN KEY (carId)
@@ -40,7 +41,7 @@ export const createRentalsTable = async () => {
     CONSTRAINT fk_rental_payment
         FOREIGN KEY (paymentId)
         REFERENCES payments(paymentId)
-        ON DELETE RESTRICT
+        ON DELETE CASCADE
 );
  `;
     try {
