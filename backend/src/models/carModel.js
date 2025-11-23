@@ -18,14 +18,21 @@ export const getAllCarsService = async () => {
 }
 
 export const getCarByIdService = async (id) => {
-    const result = await pool.query(`
-        SELECT carId, carModel, carYear, carStatus, carPrice, maintenanceId, carImageUrl, created_at
-        FROM cars
-        WHERE carId = $1
-    `, [id]);
-    return result.rows[0];
-}
-
+  const result = await pool.query(`
+    SELECT 
+      carId       AS "carId",
+      carModel    AS "carModel",
+      carYear     AS "carYear",
+      carStatus   AS "carStatus",
+      carPrice    AS "carPrice",
+      maintenanceId AS "maintenanceId",
+      carImageUrl AS "carImageUrl",
+      created_at  AS "createdAt"
+    FROM cars
+    WHERE carId = $1
+  `, [id]);
+  return result.rows[0];
+};
 // services/carService.js
 export const updateCarByIDService = async (carId, carData) => {
     const { carModel, carYear, carStatus, carPrice, maintenanceId, carImageUrl } = carData;

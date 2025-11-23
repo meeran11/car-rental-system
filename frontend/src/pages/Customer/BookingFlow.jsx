@@ -70,7 +70,6 @@ export default function BookingFlow(){
   if (!car) return <div style={{ color: '#64748B' }}>Loading car...</div>;
 
   return (
-    <div className="min-h-[calc(100vh-200px)] flex items-center justify-center py-12 px-4">
       <div className="w-full max-w-md card-modern p-8">
         <h2 className="text-xl font-semibold mb-4" style={{ color: '#0F172A' }}>Book {car.carModel}</h2>
         <div className="mb-4 p-3 rounded" style={{ backgroundColor: '#F8FAFC', borderLeft: '4px solid #3B82F6' }}>
@@ -131,6 +130,5 @@ export default function BookingFlow(){
           </button>
         </form>
       </div>
-    </div>
   );
 }

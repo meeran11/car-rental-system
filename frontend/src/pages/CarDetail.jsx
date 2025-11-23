@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useFetch } from '../hooks';
 import BookingFlow from './Customer/BookingFlow';
 
-export default function CarDetail(){
+export default function CarDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { data: car, loading, error } = useFetch(`/car/cars/${id}`);
@@ -35,18 +35,18 @@ export default function CarDetail(){
 
         <div className="rounded-xl overflow-hidden shadow-lg mb-6">
           <img 
-            src={car.carimage || 'https://via.placeholder.com/600x400?text=Car'} 
-            alt={car.carmodel}
+            src={car.carImageUrl || 'https://via.placeholder.com/600x400?text=Car'} 
+            alt={car.carModel}
             className="w-full h-96 object-cover"
           />
         </div>
 
         <div className="mb-6">
           <h1 className="text-3xl font-bold mb-2" style={{ color: '#0F172A' }}>
-           {car.carmodel}
+            {car.carModel}
           </h1>
           <p className="text-lg mb-4" style={{ color: '#64748B' }}>
-            Year: {car.caryear} 
+            Year: {car.carYear} 
           </p>
         </div>
 
@@ -64,23 +64,17 @@ export default function CarDetail(){
       </div>
 
       <div>
-        <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-6 shadow-lg sticky top-24">
-          <p style={{ color: '#64748B' }} className="text-sm mb-2">Price per day</p>
-          <p className="text-3xl font-bold mb-6" style={{ color: '#3B82F6' }}>
-            ${car.carprice?.toFixed(2) || 'N/A'}
-          </p>
           
-          {car.carstatus === 'available' && (
+          {car.carStatus === 'available' && (
             <BookingFlow car={car} />
           )}
           
-          {car.carstatus !== 'available' && (
+          {car.carStatus !== 'available' && (
             <div className="px-4 py-3 rounded-lg" style={{ backgroundColor: '#FEE2E2', color: '#991B1B', border: '1px solid #FECACA' }}>
               This car is currently unavailable
             </div>
           )}
         </div>
       </div>
-    </div>
   );
 }

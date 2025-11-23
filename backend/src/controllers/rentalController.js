@@ -219,3 +219,34 @@ export const declineRental = async (req, res, next) => {
     next(err);
   }
 };
+
+export const getPreviousRentals = async (req, res) => {
+  try {
+    const rentals = await getRentalHistoryService(req.params.id);
+    res.json({ data: rentals });
+  } catch (err) {
+    console.error('Previous rentals error:', err);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
+// GET /rental/currentRentals/:id
+export const getCurrentRentals = async (req, res) => {
+  try {
+    const rentals = await getRentedCarsByUserService(req.params.id);
+    res.json({ data: rentals });
+  } catch (err) {
+    console.error('Current rentals error:', err);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
+// GET /rental/pendingRequests/:id
+export const getPendingRequests = async (req, res) => {
+  try {
+    const rentals = await getRequestedRentalsByUserService(req.params.id);
+    res.json({ data: rentals });
+  } catch (err) {
+    console.error('Pending requests error:', err);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};

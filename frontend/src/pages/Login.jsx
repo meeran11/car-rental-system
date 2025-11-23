@@ -62,7 +62,7 @@ export default function Login(){
               className="input-modern"
             >
               <option value="customer">Customer</option>
-              <option value="staff">Staff Member</option>
+              <option value="staff">Staff</option>
             </select>
           </div>
 

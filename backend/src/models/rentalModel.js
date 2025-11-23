@@ -1,4 +1,4 @@
-import pool from '../config/db.js';
+import pool from "../config/db.js";
 
 export const createRentalService = async ({
   customerId,
@@ -8,10 +8,10 @@ export const createRentalService = async ({
   paymentId,
   startDate,
   endDate,
-  totalAmount
+  totalAmount,
 }) => {
   const client = await pool.connect();
- 
+
   try {
     await client.query("BEGIN");
 
@@ -36,7 +36,7 @@ export const createRentalService = async ({
       paymentId,
       startDate,
       endDate,
-      totalAmount
+      totalAmount,
     ];
 
     const { rows } = await client.query(insertQuery, values);
@@ -54,7 +54,7 @@ export const createRentalService = async ({
 export const getRentalHistoryService = async (userId) => {
   // 1) Lookup customerId from userId
   const { rows: custRows } = await pool.query(
-    `SELECT "customerId" FROM customers WHERE "userId" = $1`,
+    `SELECT customerid AS "customerId" FROM customers WHERE userid = $1`,
     [userId]
   );
 
@@ -64,24 +64,23 @@ export const getRentalHistoryService = async (userId) => {
 
   const customerId = custRows[0].customerId;
 
-  // 2) Fetch completed rentals from rental status
+  // 2) Fetch completed rentals
   const { rows: rentals } = await pool.query(
     `
       SELECT 
-        r.bookingId,
-        r.carId,
-        c.carModel,
-        c.carImageUrl,
-        r.startDate,
-        r.endDate,
-        r.totalAmount,
-        r.paymentId,
-        r.status
+        r.bookingid   AS "bookingId",
+        r.carid       AS "carId",
+        c.carmodel    AS "carModel",
+        c.carimageurl AS "carImageUrl",
+        r.startdate   AS "startDate",
+        r.enddate     AS "endDate",
+        r.totalamount AS "totalAmount",
+        r.paymentid   AS "paymentId",
+        r.status      AS "status"
       FROM rentals r
-      JOIN cars c ON r.carId = c.carId
-      WHERE r.customerId = $1
-        AND r.status = 'completed'
-      ORDER BY r.startDate DESC
+      JOIN cars c ON r.carid = c.carid
+      WHERE r.customerid = $1 AND r.status = 'completed'
+      ORDER BY r.startdate DESC
       LIMIT 10
     `,
     [customerId]
@@ -89,7 +88,6 @@ export const getRentalHistoryService = async (userId) => {
 
   return rentals;
 };
-
 
 export const getRequestedRentalsService = async () => {
   const { rows } = await pool.query(
@@ -126,39 +124,48 @@ export const approveRentalService = async ({ bookingId, staffId }) => {
     await client.query("BEGIN");
 
     // 1) Check rental status
-    const { rows } = await client.query(`
+    const { rows } = await client.query(
+      `
       SELECT r.carId, r.status
       FROM rentals r
       JOIN cars c ON r.carId = c.carId
       WHERE r.bookingId = $1
       FOR UPDATE
-    `, [bookingId]);
+    `,
+      [bookingId]
+    );
 
     if (rows.length === 0) {
       throw new Error("Rental not found");
     }
 
     const { carid, status } = rows[0];
-    if (status !== 'requested') {
+    if (status !== "requested") {
       throw new Error("Rental is not in requested status");
     }
 
     // 2) Update car status to 'rented'
-    await client.query(`
+    await client.query(
+      `
       UPDATE cars
       SET carStatus = 'rented'
       WHERE carId = $1
-    `, [carid]);
+    `,
+      [carid]
+    );
 
     // 3) Update rentals table with staffId and status to 'active'
-    await client.query(`
+    await client.query(
+      `
       UPDATE rentals
       SET staffId = $1, status = 'active'
       WHERE bookingId = $2
-    `, [staffId, bookingId]);
+    `,
+      [staffId, bookingId]
+    );
 
     await client.query("COMMIT");
-    return { bookingId, carid, staffId, status: 'active' };
+    return { bookingId, carid, staffId, status: "active" };
   } catch (err) {
     await client.query("ROLLBACK");
     throw err;
@@ -198,20 +205,20 @@ export const getRequestedRentalsByUserService = async (userId) => {
   const { rows } = await pool.query(
     `
     SELECT
-      r.bookingId,
-      r.carId,
-      c.carModel,
-      c.carImageUrl,
-      r.startDate,
-      r.endDate,
-      r.totalAmount,
-      r.paymentId,
-      r.status
-    FROM rentals r
-    JOIN cars c ON r.carId = c.carId
-    WHERE r.userId = $1
-      AND r.status = 'requested'
-    ORDER BY r.startDate ASC;
+  r.bookingid   AS "bookingId",
+  r.carid       AS "carId",
+  c.carmodel    AS "carModel",
+  c.carimageurl AS "carImageUrl",
+  r.startdate   AS "startdate",
+  r.enddate     AS "enddate",
+  r.totalamount AS "totalamount",
+  r.paymentid   AS "paymentId",
+  r.status      AS "status"
+FROM rentals r
+JOIN cars c ON r.carid = c.carid
+WHERE r.userid = $1
+  AND r.status = 'requested'
+ORDER BY r.startdate ASC;
     `,
     [userId]
   );
@@ -238,7 +245,7 @@ export const endRentalService = async (bookingId) => {
     }
 
     const { carid, status } = rows[0];
-    if (status !== 'active') {
+    if (status !== "active") {
       throw new Error("Rental is not currently active");
     }
 
@@ -255,7 +262,7 @@ export const endRentalService = async (bookingId) => {
     );
 
     await client.query("COMMIT");
-    return { bookingId, carId, status: 'completed' };
+    return { bookingId, carId, status: "completed" };
   } catch (err) {
     await client.query("ROLLBACK");
     throw err;
@@ -283,7 +290,7 @@ export const declineRentalService = async (bookingId) => {
     }
 
     const { carid, status, paymentid } = rows[0];
-    if (status !== 'requested') {
+    if (status !== "requested") {
       throw new Error("Rental is not in requested status");
     }
 
@@ -294,10 +301,9 @@ export const declineRentalService = async (bookingId) => {
     );
 
     // 3) Delete the associated payment (reverse payment)
-    await client.query(
-      `DELETE FROM payments WHERE paymentId = $1`,
-      [paymentid]
-    );
+    await client.query(`DELETE FROM payments WHERE paymentId = $1`, [
+      paymentid,
+    ]);
 
     // 4) Mark rental as declined
     await client.query(
@@ -306,12 +312,12 @@ export const declineRentalService = async (bookingId) => {
     );
 
     await client.query("COMMIT");
-    return { 
-      bookingId, 
-      carid, 
+    return {
+      bookingId,
+      carid,
       paymentid,
-      status: 'declined',
-      message: 'Rental declined successfully. Your payment has been reversed.'
+      status: "declined",
+      message: "Rental declined successfully. Your payment has been reversed.",
     };
   } catch (err) {
     await client.query("ROLLBACK");
