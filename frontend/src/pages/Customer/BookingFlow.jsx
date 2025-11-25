@@ -199,7 +199,7 @@ export default function BookingFlow(){
               </div>
 
               <button type="submit" className="btn-primary w-full" disabled={loading}>
-                {loading ? 'Processing...' : 'Complete Booking'}
+                {loading ? 'Processing...' : 'Request Booking'}
               </button>
             </form>
           </div>

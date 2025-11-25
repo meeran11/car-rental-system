@@ -204,38 +204,38 @@ ORDER BY r.startdate ASC;
   return rows;
 };
 
-export const endRentalService = async (carId) => {
+export const endRentalService = async (bookingId) => {
   const client = await pool.connect();
   try {
     await client.query("BEGIN");
 
     // 1) Lock rental and check status
     const { rows } = await client.query(
-      `SELECT r.bookingId,r.carId, r.status
-       FROM rentals r
-       WHERE r.carId = $1
+      `SELECT bookingid, carid, status
+       FROM rentals
+       WHERE bookingid = $1
        FOR UPDATE`,
-      [carId]
+      [bookingId]
     );
 
     if (rows.length === 0) {
       throw new Error("Rental not found");
     }
 
-    const { bookingid , carid, status } = rows[0];
+    const { bookingid, carid, status } = rows[0];
     if (status !== "active") {
       throw new Error("Rental is not currently active");
     }
 
     // 2) Update car status back to 'available'
     await client.query(
-      `UPDATE cars SET carStatus = 'available' WHERE carId = $1`,
+      `UPDATE cars SET carstatus = 'available' WHERE carid = $1`,
       [carid]
     );
 
     // 3) Mark rental as completed
     await client.query(
-      `UPDATE rentals SET status = 'completed', startDate = NULL, endDate = NULL WHERE bookingId = $1`,
+      `UPDATE rentals SET status = 'completed', startdate = NULL, enddate = NULL WHERE bookingid = $1`,
       [bookingid]
     );
 

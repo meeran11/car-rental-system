@@ -1,7 +1,18 @@
 import pool from '../config/db.js';
 
 export const getAllMaintenance = async () => {
-  const result = await pool.query('SELECT * FROM maintenance ORDER BY maintenancedate DESC');
+  const result = await pool.query(`
+    SELECT 
+      m.maintenanceid,
+      m.maintenancedate,
+      m.maintenancetype,
+      m.maintenancecost,
+      c.carid AS "carId",
+      c.carmodel AS "carModel"
+    FROM maintenance m
+    JOIN cars c ON c.maintenanceid = m.maintenanceid
+    ORDER BY m.maintenancedate DESC
+  `);
   return result.rows;
 };
 

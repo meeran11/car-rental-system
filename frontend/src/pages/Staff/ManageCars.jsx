@@ -103,17 +103,24 @@ export default function ManageCars(){
     }
   }
 
-  async function endRental(carId){
+  async function endRental(bookingid){
     if (!confirm('Are you sure you want to end this rental?')) return;
     try {
-      console.log('Ending rental for carId:', carId);
-      await fetchJson(`/rental/endRental/${carId}`, { method: 'POST' });
+      console.log('Ending rental for carId:', bookingid);
+      await fetchJson(`/rental/endRental/${bookingid}`, { method: 'POST' });
       alert('Rental ended successfully');
       loadCars();
     } catch (e) {
       alert(e.message || 'Failed to end rental');
     }
   }
+const isRentalActive = (car) => {
+  return (
+    car.bookingid &&
+    car.rentalstatus === 'active' &&
+    new Date(car.enddate) > new Date()
+  );
+};
 
   return (
     <div>
@@ -195,7 +202,7 @@ export default function ManageCars(){
                 <div className="flex gap-3 pt-3 border-t border-slate-100">
                   {c.bookingid ? (
                     <button 
-                      onClick={() => endRental(c.carid)}
+                      onClick={() => endRental(c.bookingid)}
                       className="group/end flex-1 relative px-4 py-3 rounded-xl font-bold text-sm bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden"
                     >
                       <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover/end:translate-x-full transition-transform duration-1000"></div>

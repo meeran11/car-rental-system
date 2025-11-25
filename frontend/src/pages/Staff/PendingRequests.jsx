@@ -77,9 +77,11 @@ export default function PendingRequests(){
                   
                   <div className="flex flex-wrap items-center gap-4 text-sm text-slate-600">
                     <div className="flex items-center gap-2">
-                      <span className="font-semibold text-slate-700">Duration:</span>
-                      <span>{r.startdate} to {r.enddate}</span>
-                    </div>
+  <span className="font-semibold text-slate-700">Duration:</span>
+  <span>
+    {new Date(r.startdate).toLocaleDateString()} to {new Date(r.enddate).toLocaleDateString()}
+  </span>
+</div>
                     <div className="h-4 w-px bg-slate-300"></div>
                     <div className="flex items-center gap-2">
                       <span className="font-semibold text-slate-700">Total:</span>
