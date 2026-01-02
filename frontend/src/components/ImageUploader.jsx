@@ -6,8 +6,8 @@ export default function ImageUploader({ onImageUrlChange, imagePreview, disabled
   const [uploadProgress, setUploadProgress] = useState(0);
   const [uploadError, setUploadError] = useState(null);
   const [uploadSuccess, setUploadSuccess] = useState(false);
-
-  const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME || 'diubwrdz5';
+ 
+  const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME || 'drrhzkpxn';
   const uploadPreset = 'rental-cars';
 
   async function handleFileSelect(e) {

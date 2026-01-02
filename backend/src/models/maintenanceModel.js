@@ -1,12 +1,24 @@
-import fs from 'fs';
 import pool from '../config/db.js';
 
-const sql = fs.readFileSync('./src/views/maintenance_with_cars.sql', 'utf8');
-await pool.query(sql);
-
 export const getAllMaintenance = async () => {
-  const result = await pool.query('SELECT * FROM maintenance_with_cars');
-  return result.rows;
+  // ✅ FIX: Updated to match your specific schema columns
+  const query = `
+    SELECT 
+      m.maintenanceid,
+      m.maintenancedate,
+      m.maintenancetype,
+      m.maintenancecost,
+      c.carid,
+      c.carmodel,      -- Fixed: Matches your schema
+      c.caryear,       -- Fixed: Matches your schema
+      c.carstatus,     -- Added: Good to see current status
+      c.carimageurl    -- Added: Useful for the frontend
+    FROM maintenance m
+    LEFT JOIN cars c ON c.maintenanceid = m.maintenanceid
+    ORDER BY m.maintenancedate DESC
+  `;
+  
+  const result = await pool.query(query);
   return result.rows;
 };
 
@@ -29,8 +41,9 @@ export const createMaintenanceWithCarLink = async (carId, { maintenanceDate, mai
 
     const maintenanceid = insertResult.rows[0].maintenanceid;
 
+    // Matches your schema: updates 'maintenanceid' and 'carstatus'
     await client.query(
-      `UPDATE cars SET maintenanceid = $1,carstatus = 'maintenance' WHERE carid = $2`,
+      `UPDATE cars SET maintenanceid = $1, carstatus = 'maintenance' WHERE carid = $2`,
       [maintenanceid, carId]
     );
 
@@ -80,8 +93,9 @@ export const deleteMaintenanceAndUnlinkCar = async (maintenanceId) => {
   try {
     await client.query('BEGIN');
 
+    // Matches your schema: sets carstatus back to 'available'
     await client.query(
-      `UPDATE cars SET maintenanceid = NULL,carstatus = 'available' WHERE maintenanceid = $1`,
+      `UPDATE cars SET maintenanceid = NULL, carstatus = 'available' WHERE maintenanceid = $1`,
       [maintenanceId]
     );
 
