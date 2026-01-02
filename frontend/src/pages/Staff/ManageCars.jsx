@@ -124,7 +124,7 @@ const isRentalActive = (car) => {
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex justify-between items-center mb-6 mt-16">
         <h2 className="text-2xl font-bold" style={{ color: '#0F172A' }}>Manage Cars</h2>
         <button 
           onClick={openNewCarModal}
