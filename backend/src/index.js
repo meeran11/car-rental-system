@@ -32,16 +32,16 @@ app.use(cors());
 app.get('/', (req, res) => {
   res.send('API is running...');
 });
-app.use('/api/user', userRoutes);
-app.use('/api/car', carRoutes);
-app.use('/api/maintenance', maintenanceRoutes);
-app.use('/api/payment', paymentRoutes);
-app.use('/api/rental', rentalRoutes);
+app.use('/user', userRoutes);
+app.use('/car', carRoutes);
+app.use('/api', maintenanceRoutes);
+app.use('/payment', paymentRoutes);
+app.use('/rental', rentalRoutes);
 // Root test route
 app.get('/', async (req, res) => {
   const result = await pool.query('SELECT current_database()');
   res.send(`Connected to database: ${result.rows[0].current_database}`);
-});
+}); 
 
 // Error handler
 app.use(errorHandling);
