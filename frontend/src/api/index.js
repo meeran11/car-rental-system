@@ -1,5 +1,5 @@
 // ✅ FIX 1: Match the variable name we set in Vercel (VITE_API_URL)
-const BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const BASE = import.meta.env.VITE_API_URL || 'http://localhost:5001';
 
 async function fetchJson(path, options = {}) {
   const url = `${BASE}${path}`;

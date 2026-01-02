@@ -2,7 +2,7 @@ import React from 'react';
 
 export default function FiltersPanel({onChange}) {
   return (
-    <aside className="w-64 p-4 rounded-lg card-modern">
+    <aside className="mt-16 w-64 p-4 rounded-lg card-modern">
       <h4 className="font-semibold mb-4" style={{ color: '#0F172A' }}>Filters</h4>
       <form onChange={onChange}>
         <div className="mb-4">
